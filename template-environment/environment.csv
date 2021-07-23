@@ -1,0 +1,8 @@
+aws-api-key,
+aws-api-secret,
+aws-api-session-token,
+aws-region,us-west-2
+automox-api-key,
+automox-agent-access-key,
+automox-org-id,
+automox-api-url-base,https://console.automox.com/api
