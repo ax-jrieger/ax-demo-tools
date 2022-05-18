@@ -1,6 +1,6 @@
 ## Launch the VM's into the created environment
 
-param ($name, $location, $winusername, $winpass)
+param ($name, $location, $winusername, $winpass, $number)
 
 ### Easy Button - Set Variables ###
 # NOTE: This should be set the same as the EnvName variable used in the environemnt setup script
@@ -9,6 +9,7 @@ $EnvName = $name
 $EnvLocation = $location
 $WindowsUserName = $winusername
 $WindowsPasswordClear = $winpass
+$NumberOfVM = $number
 
 ### Easy Button - Complete ###
 
@@ -25,44 +26,65 @@ $Cred = New-Object System.Management.Automation.PSCredential ($username, $passwo
 $pubName = "MicrosoftWindowsDesktop"
 $offerName = "Windows-10"
 $skuName = "win10-21h2-pro-g2"
-$version = "19044.1586.220303"
+$version = "latest"
 
 # Build the Image name to launch
 $ImageName = $pubName + ":" + $offerName + ":" + $skuName + ":" + $version
 
 # Create the VM Config and Launch
 $ResourceGroupName = $EnvName + "-RG"
-$VMName = $EnvName + "-VM2"
 $VMSize = "Standard_DS1"
 $VirtualNetworkName = $EnvName + "-VN"
 $SubnetName = $EnvName + "-SN"
 $SecurityGroupName = $EnvName + "-NSG"
-$PublicIpAddressName = $EnvName + "-PIP2"
 $OpenPorts = 3389
 
-New-AzVM `
-  -ResourceGroupName $ResourceGroupName `
-  -Name $VMName `
-  -Location $EnvLocation `
-  -ImageName $ImageName `
-  -Size $VMSize `
-  -VirtualNetworkName $VirtualNetworkName `
-  -SubnetName $SubnetName `
-  -SecurityGroupName $SecurityGroupName `
-  -PublicIpAddressName $PublicIpAddressName `
-  -Credential $Cred `
-  -OpenPorts $OpenPorts `
-  -Verbose
+# Script path for the AX load script
+$ScriptFileName = "ax-demo-script-automox-windows.ps1"
+$ScriptFullNameAndPath = Join-Path $PSScriptRoot $ScriptFileName
+#Write-Output $ScriptFullNameAndPath
 
-# Execute the default script on the VM to load Automox
-$ScriptPath = "ax-demo-script-automox-windows.ps1"
-Invoke-AzVMRunCommand `
-  -ResourceGroupName $ResourceGroupName `
-  -VMName $VMName `
-  -CommandId 'RunPowerShellScript' `
-  -ScriptPath $ScriptPath
+for ($num = 1; $num -lt $NumberOfVM+1; $num++) {
+  # Start working through the names of the VM and Public IP assignments
+  $VMName = $EnvName + "-VM" + $num
+  $PublicIpAddressName = $EnvName + "-PIP" + $num
 
-#-Parameter @{param1 = "var1"; param2 = "var2"}
+  #Create hashtable with parameters and their values
+  $VMInfo = @{
+    ResourceGroupName = $ResourceGroupName;
+    Name = $VMName;
+    Location = $EnvLocation;
+    ImageName = $ImageName;
+    Size = $VMSize;
+    VirtualNetworkName = $VirtualNetworkName;
+    SubnetName = $SubnetName;
+    SecurityGroupName = $SecurityGroupName;
+    PublicIpAddressName = $PublicIpAddressName;
+    Credential = $Cred;
+    OpenPorts = $OpenPorts;
+    #Verbose = $true
+  }
 
+  $VMRunCommandInfo = @{
+    ResourceGroupName = $ResourceGroupName;
+    VMName = $VMName;
+    CommandId = 'RunPowerShellScript';
+    ScriptPath = $ScriptFullNameAndPath
+    #Parameter = @{param1 = "var1"; $param2 = "var2"}
+  }
 
-  
+  # Spawn jobs for each VM
+  $ScriptBlock = {
+    # Get the passed in paramaters
+    param ($VMInfo, $VMRunCommandInfo)
+
+    # Spawn the VM
+    New-AzVM @VMInfo
+
+    # Execute the default script on the VM to load Automox
+    Invoke-AzVMRunCommand @VMRunCommandInfo
+  }
+
+  $Job = Start-Job -ScriptBlock $ScriptBlock -ArgumentList $VMInfo,$VMRunCommandInfo
+  Write-Output $Job
+}
