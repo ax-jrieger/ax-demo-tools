@@ -1,20 +1,19 @@
 ## Launch the VM's into the created environment
 
-param ($name, $location, $winusername, $winpass, $number)
+param($name)
 
-### Easy Button - Set Variables ###
-# NOTE: This should be set the same as the EnvName variable used in the environemnt setup script
+# Load in the JSON config file
+$fileName = "./"+$name+".conf"
+$config = Get-Content -Path $fileName | ConvertFrom-Json
 
-$EnvName = $name
-$EnvLocation = $location
-$WindowsUserName = $winusername
-$WindowsPasswordClear = $winpass
-$NumberOfVM = $number
-
-### Easy Button - Complete ###
-
-
-### Main Script - Modifications here will break assumptions based on the EnvName variable - please modify with care
+# Setting some internal variables so I dont need to keep changing them later
+$EnvName = $config.name
+$EnvLocation = $config.location
+$WindowsUserName = $config.winusername
+$WindowsPasswordClear = $config.winpass
+$NumberOfVM = $config.number
+$AXAccessKey = $config.axaccesskey
+$AXGroupName = $config.axgroup
 
 # Credentaials
 $UserName = $WindowsUserName
@@ -70,7 +69,7 @@ for ($num = 1; $num -lt $NumberOfVM+1; $num++) {
     VMName = $VMName;
     CommandId = 'RunPowerShellScript';
     ScriptPath = $ScriptFullNameAndPath
-    #Parameter = @{param1 = "var1"; $param2 = "var2"}
+    Parameter = @{"AccessKey"=$AXAccessKey;"GroupName"=$AXGroupName}
   }
 
   # Spawn jobs for each VM

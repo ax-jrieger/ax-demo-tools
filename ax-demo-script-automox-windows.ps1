@@ -1,10 +1,9 @@
 ### Set variables for the VM ###
 
-# UUID of the Automox Environment you want to attach to
-$AccessKey = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-
-# Group name in Automox that this system should default to
-$GroupName = "GROUPNAMEHERE"
+# $AccessKey is UUID of the Automox Environment you want to attach to
+# ex: "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+# $GroupName is the group name in Automox that this system should default to
+param($AccessKey,$GroupName)
 
 # Parent group name for the Group name above (Only required if you are using nested groups)
 #$ParentGroupName = "Default"

@@ -1,14 +1,16 @@
 ## Set up Azure AX-Demo Environment
 
-# NOTE: Please set the name to 10 characters or less and no spaces
-# Location should be the Azure location for the environment Ex: centralus
-param ($name, $location)
+# NOTE: Please pass in the name to the environment you want to destroy
+# Env name only - script will append the conf for the conf file
+param ($name)
 
-### Easy Button - Set Variables ###
-$EnvName = $name
-$EnvLocation = $location
-### Easy Button - Complete ###
+# Load in the JSON config file
+$fileName = "./"+$name+".conf"
+$config = Get-Content -Path $fileName | ConvertFrom-Json
 
+# Setting some internal variables so I dont need to keep changing them later
+$EnvName = $config.name
+$EnvLocation = $config.location
 
 ### Main Script - Modifications here will break future assumptions based on the EnvName variable - please modify with care
 $ResourceGroupName = $EnvName + "-RG"

@@ -1,6 +1,9 @@
 # Wildcard Ignore
 ignore_*
 
+# Config Files
+*.conf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
