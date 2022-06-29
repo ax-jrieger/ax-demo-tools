@@ -1,16 +1,19 @@
 ## Set up Azure AX-Demo Environment
 
-# NOTE: Please pass in the name to the environment you want to destroy
-# Env name only - script will append the conf for the conf file
-param ($name)
+# NOTE: Please pass in the name of the CSV environment you want to create
+param ($EnvCSVname)
 
-# Load in the JSON config file
-$fileName = "./"+$name+".conf"
-$config = Get-Content -Path $fileName | ConvertFrom-Json
+# Load in the CSV environment file
+$fileName = "./"+$EnvCSVname
+$EnvConfig = Import-CSV -Path $fileName
+
+# Load in the CSV VM information file (Not needed for this file, but maintaining load path for consistancy and error checking)
+$fileName = "./"+$config.EnvVMInformationCSVFileName
+$VMConfig = Import-CSV -Path $fileName
 
 # Setting some internal variables so I dont need to keep changing them later
-$EnvName = $config.name
-$EnvLocation = $config.location
+$EnvName = $EnvConfig.EnvName
+$EnvLocation = $EnvConfig.AzureLocation
 
 ### Main Script - Modifications here will break future assumptions based on the EnvName variable - please modify with care
 $ResourceGroupName = $EnvName + "-RG"

@@ -1,19 +1,19 @@
 ## Launch the VM's into the created environment
 
-param($name)
+# NOTE: Please pass in the name of the CSV environment you want to create
+param ($EnvCSVname)
 
-# Load in the JSON config file
-$fileName = "./"+$name+".conf"
-$config = Get-Content -Path $fileName | ConvertFrom-Json
+# Load in the CSV environment file
+$fileName = "./"+$EnvCSVname
+$EnvConfig = Import-CSV -Path $fileName
+
+# Load in the CSV VM information file
+$fileName = "./"+$config.EnvVMInformationCSVFileName
+$VMConfig = Import-CSV -Path $fileName
 
 # Setting some internal variables so I dont need to keep changing them later
-$EnvName = $config.name
-$EnvLocation = $config.location
-$WindowsUserName = $config.winusername
-$WindowsPasswordClear = $config.winpass
-$NumberOfVM = $config.number
-$AXAccessKey = $config.axaccesskey
-$AXGroupName = $config.axgroup
+$EnvName = $EnvConfig.EnvName
+$EnvLocation = $EnvConfig.AzureLocation
 
 # Credentaials
 $UserName = $WindowsUserName
@@ -22,13 +22,13 @@ $Password = ConvertTo-SecureString $passwordclear -AsPlainText -Force
 $Cred = New-Object System.Management.Automation.PSCredential ($username, $password)
 
 # Set Image Information
-$pubName = "MicrosoftWindowsDesktop"
-$offerName = "Windows-10"
-$skuName = "win10-21h2-pro-g2"
-$version = "latest"
+#$pubName = "MicrosoftWindowsDesktop"
+#$offerName = "Windows-10"
+#$skuName = "win10-21h2-pro-g2"
+#$version = "latest"
 
 # Build the Image name to launch
-$ImageName = $pubName + ":" + $offerName + ":" + $skuName + ":" + $version
+#$ImageName = $pubName + ":" + $offerName + ":" + $skuName + ":" + $version
 
 # Create the VM Config and Launch
 $ResourceGroupName = $EnvName + "-RG"
@@ -39,7 +39,7 @@ $SecurityGroupName = $EnvName + "-NSG"
 $OpenPorts = 3389
 
 # Script path for the AX load script
-$ScriptFileName = "ax-demo-script-automox-windows.ps1"
+#$ScriptFileName = "ax-demo-script-automox-windows.ps1"
 $ScriptFullNameAndPath = Join-Path $PSScriptRoot $ScriptFileName
 #Write-Output $ScriptFullNameAndPath
 
@@ -47,6 +47,17 @@ for ($num = 1; $num -lt $NumberOfVM+1; $num++) {
   # Start working through the names of the VM and Public IP assignments
   $VMName = $EnvName + "-VM" + $num
   $PublicIpAddressName = $EnvName + "-PIP" + $num
+
+  # VM Details
+  $WindowsUserName = $VMConfig.WinAdminUserName
+  $WindowsPasswordClear = $VMConfig.WinAdminPassword
+  $NumberOfVM = $VMConfig.number
+  $AXAccessKey = $VMConfig.AutomoxAccessKey
+  $AXGroupName = $VMConfig.AutomoxGroup
+  $ImageName = $VMConfig.ImageName
+  $ScriptFileName = $VMConfig.AutomoxAgentScriptName
+  $VMName = $VMConfig.VMName
+  $VMSize = $VMConfig.AzureVMSize
 
   #Create hashtable with parameters and their values
   $VMInfo = @{
