@@ -1,7 +1,0 @@
-#!/bin/bash
-sleep 10
-apt-get update -y
-apt-get install curl aptitude lsb-release -y
-curl -sS "https://console.automox.com/downloadInstaller?accesskey=<<AccessKeyHere>>" | bash
-sleep 10
-reboot

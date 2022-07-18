@@ -1,1 +1,0 @@
-instance_name,instance_os,ax_org_id,ax_agent_key,ax_group_id,aws_iam_instance_profile_name,aws_image_id,aws_instance_type,aws_key_name,number_of_instances,aws_region,aws_secuirty_group_id,aws_subnet_id,UserDataScript
