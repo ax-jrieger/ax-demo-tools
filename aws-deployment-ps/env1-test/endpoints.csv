@@ -1,0 +1,2 @@
+instance_name,instance_os,ax_org_id,ax_agent_key,ax_group_id,aws_iam_instance_profile_name,aws_image_id,aws_instance_type,number_of_instances,aws_region,aws_secuirty_group_ids,aws_subnet_id,UserDataScript
+test-win10,Windows 10,37074,fe499e7f-2917-44e4-a7dc-03606f566308,132702,SessionManagerInstanceProfile,ami-00e118ff15f148af7,t2.medium,2,us_west_2,"""sg-0796a4d5eb4ca6511,sg-0959ccb5b43940cc7""",subnet-09d363e74598c5826,userdata-windows-ax-load.txt

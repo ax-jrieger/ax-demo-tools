@@ -1,0 +1,5 @@
+<powershell>
+Set-ExecutionPolicy Unrestricted -Force
+(new-object net.webclient).DownloadFile('https://cdn2.hubspot.net/hubfs/2242551/Documentation%20Assets/Install-AxAgentMsi.ps1','c:\Install-AxAgentMsi.ps1')
+c:\Install-AxAgentMsi.ps1 -AccessKey <<AccessKeyHere>>
+</powershell>
